@@ -1,0 +1,173 @@
+﻿@page "/cities"
+
+@inject HttpClient http
+
+@using BlazorCitiesApp.Client.Models
+
+<h2>
+    @message
+</h2>
+
+<Counter Start="10" CountChanged="ShowCount" />
+
+<br />
+<br />
+
+<Counter Start="0" CountChanged="ShowCount"></Counter>
+
+<br />
+<br />
+
+<Counter Start="50" CountChanged="ShowCount"></Counter>
+
+<br />
+<br />
+
+City ID
+<br />
+<input type="text" readonly @bind="currentCity.CityID" />
+<br />
+<br />
+City Name
+<br />
+<input type="text" @bind="currentCity.CityName" />
+<br />
+<br />
+Country
+<br />
+@*<input type="text" @bind="currentCity.Country" />*@
+
+<select @bind="currentCity.Country">
+    @if (countries != null)
+    {
+        @foreach (string land in countries)
+        {
+            <option>@land</option>
+        }
+    }
+</select>
+
+<br />
+<br />
+Population
+<br />
+<input type="text" @bind="currentCity.Population" />
+<br />
+<br />
+Year
+<br />
+<input type="text" @bind="currentCity.Year" />
+
+<br />
+<br />
+
+<button @onclick="EditCity">Wijzigen</button>
+
+<br />
+<br />
+
+<button @onclick="AddCity">Toevoegen</button>
+
+<br />
+<br />
+
+@if (cities != null)
+{
+    <h3>Cities: @cities.Count()</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th @onclick="() => cities = cities.OrderBy(c => c.CityID).ToList()">City ID</th>
+                <th @onclick="OrderByName">City Name</th>
+                <th>Country</th>
+                <th @onclick="OrderByPopulation">Population</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in cities)
+            {
+                <tr @onclick="() => currentCity = c" class="@(c.CityID == currentCity.CityID ? "currentRow": "")">
+                    <td>@c.CityID</td>
+                    <td>@c.CityName</td>
+                    <td>@c.Country</td>
+                    <td>@c.Population</td>
+                    <td>@c.Year</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => DeleteCityAsync(c)">Delete City</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>Cities downloaden</h3>
+}
+
+@code {
+    List<City>? cities;
+    List<string>? countries;
+    City currentCity = new City();
+    string message = "";
+
+    void ShowCount(int num)
+    {
+        Console.WriteLine(num);
+        message = $"De waarde is nu {num}";
+    }
+
+    async Task AddCity()
+    {
+        message = $"Ik ga {currentCity.CityName} toevoegen";
+        await http.PostAsJsonAsync("https://xanderwemmers.nl/api/cities", currentCity);
+        cities = await http!.GetFromJsonAsync<List<City>>("https://xanderwemmers.nl/api/cities");
+    }
+
+    async Task EditCity()
+    {
+        message = $"Ik ga {currentCity.CityName} wijzigen";
+        await http.PutAsJsonAsync("https://xanderwemmers.nl/api/cities/" + currentCity.CityID, currentCity);
+        cities = await http.GetFromJsonAsync<List<City>>("https://xanderwemmers.nl/api/cities");
+    }
+
+    async Task DeleteCityAsync(City c)
+    {
+        message = $"Ik ga {c.CityName} verwijderen";
+
+        await http.DeleteAsync("https://xanderwemmers.nl/api/cities/" + c.CityID);
+        await OnInitializedAsync();
+
+        // Soms is het nodig om de component expliciet te re-renderen
+        // Dat is met deze functie aanroep:
+        //StateHasChanged();
+    }
+
+    void OrderByName()
+    {
+        cities = cities.OrderBy(c => c.CityName).ToList();
+    }
+
+    void OrderByPopulation()
+    {
+        cities = cities.OrderByDescending(c => c.Population).ToList();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        countries = await http.GetFromJsonAsync<List<String>>("api/countries");
+        cities = await http.GetFromJsonAsync<List<City>>("https://xanderwemmers.nl/api/cities");
+    }
+
+}
+
+
+<style scoped>
+
+    .currentRow {
+        background-color: silver;
+    }
+
+</style>

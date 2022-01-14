@@ -1,0 +1,106 @@
+﻿@page "/verkiezingen"
+@using BlazorCitiesApp.Client.Models
+@inject HttpClient http
+
+@if (partijen == null)
+{
+    <h3>Data downloaden. Even geduld...</h3>
+}
+else
+{
+    <h3>Verkiezingen: @partijen.Count partijen</h3>
+
+    <p>
+        Er zijn in totaal @totaalZetels zetels.
+    </p>
+
+    <p>
+        De gekozen coalitie heeft @totaalCoalitie zetels.
+    </p>
+
+    <p>
+        De gekozen coalitie:
+        @foreach(var p in coalitie!)
+        {
+            <span>@p.Naam&nbsp;&nbsp;</span>
+        }
+    </p>
+
+    @if (isMeerderheid)
+    {
+        <p class="groen">
+            Dit is een meerderheid
+        </p>
+    }
+    else
+    {
+        <p class="rood">
+            Dit is geen meerderheid
+        </p>
+    }
+
+    <svg height="50">
+        <rect x="0" y="0" height="30" width="@totaalZetels" fill="lightgray"></rect>
+        <rect x="0" y="0" height="30" width="@totaalCoalitie" fill="@(isMeerderheid ? "green" : "red")"></rect>
+    </svg>
+
+    <br />
+    <br />
+
+    <button @onclick="ClearCoalitie">Clear</button>
+
+    <table class="table">
+        @foreach(var p in partijen)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" @bind="p.InCoalitie" />
+                </td>
+                <td>@p.Zetels</td>
+                <td>@p.VolledigeNaam</td>
+            </tr>
+        }
+    </table>
+}
+
+@code {
+
+    List<Partij>? partijen;
+
+    List<Partij>? coalitie => partijen!.Where(p => p.InCoalitie).ToList();
+
+    int totaalZetels => partijen!.Sum(p => p.Zetels);
+
+    int totaalCoalitie => coalitie!.Sum(p => p.Zetels);
+
+    bool isMeerderheid => totaalCoalitie > (totaalZetels / 2);
+
+    void ClearCoalitie()
+    {
+        foreach(var p in partijen!)
+        {
+            p.InCoalitie = false;
+        }
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var data = await http!.GetFromJsonAsync<List<Partij>>("https://xanderwemmers.nl/api/verkiezingen");
+
+        partijen = data!.OrderByDescending(p => p.Zetels).ToList();
+    }
+}
+
+<style scoped>
+
+    .rood
+    {
+        color: red;
+    }
+
+    .groen
+    {
+        color: green;
+    }
+
+</style>
