@@ -1,0 +1,96 @@
+﻿@page "/chatpage"
+@using Microsoft.AspNetCore.SignalR.Client
+
+@implements IAsyncDisposable
+
+@inject NavigationManager manager
+
+<h3>ChatPage</h3>
+
+Naam:
+<br />
+<input type="text" @bind="username" />
+
+<br />
+<br />
+
+Chat:
+<br />
+<input type="text" @bind="message" />
+
+<br />
+<br />
+
+<button @onclick="SendMessage">Verstuur</button>
+
+<br />
+<br />
+
+<button @onclick="Logout">Uitloggen</button>
+
+<br />
+<br />
+
+@foreach (var msg in allMessages)
+{
+    <p>
+        @((MarkupString)msg)
+    </p>
+}
+
+@code {
+    HubConnection cn;
+
+    string username = "";
+    string message = "";
+
+    List<string> allMessages = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        // Gebruik de NavigationManager om de juiste URL op te bouwen
+        // Zie ook de @inject bovenaan deze file
+        var builder = new HubConnectionBuilder().WithUrl(manager.ToAbsoluteUri("/chathub"));
+
+        cn = builder.Build();
+
+        cn.On<string, string>("ReceiveMessage", (name, chat) =>
+        {
+        // Voeg het binnenkomende chatbericht toe aan de lijst van messages
+        allMessages.Add($"{DateTime.Now.ToString("HH:mm:ss")} - {name}: {chat}");
+            StateHasChanged();
+        });
+
+        cn.On<string>("UserLoggedout", name =>
+        {
+        // Er is een gebruiker uitgelogd
+        allMessages.Add($"<i>{DateTime.Now.ToString("HH:mm:ss")} - {name} is uitgelogd</i>");
+            StateHasChanged();
+        });
+
+        allMessages.Add("<i>Connecting...</i>");
+
+        await cn.StartAsync();
+    }
+
+
+
+    async Task Logout()
+    {
+        await cn.SendAsync("Logout", username);
+        await cn.StopAsync();
+
+    }
+
+    void SendMessage()
+    {
+        // Verstuur een bericht van de client naar de server
+        cn.SendAsync("SendChat", username, message);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        cn?.DisposeAsync();
+    }
+
+}

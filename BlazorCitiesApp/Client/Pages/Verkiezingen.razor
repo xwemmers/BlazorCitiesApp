@@ -65,6 +65,8 @@ else
 
 @code {
 
+    // Deze C# wordt gecompileerd naar Web Assembly
+
     List<Partij>? partijen;
 
     List<Partij>? coalitie => partijen!.Where(p => p.InCoalitie).ToList();

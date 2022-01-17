@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@inject IJSRuntime ijs;
+
 <PageTitle>Index</PageTitle>
 
 <h1>Hello, world!</h1>
@@ -7,3 +9,20 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+<button onclick="alert('Hello')">Klik voor JS</button>
+
+@code {
+    protected override async void OnInitialized()
+    {
+        // Voer een functie die geen return waarde heeft
+        await ijs.InvokeVoidAsync("alert", "Hello World");
+
+        // Of InvokeAsync als de functie wel een return waarde heeft
+
+        //var result = await ijs.InvokeAsync<int>("optellen", 20, 40);
+
+        // De functie optellen zou ergens nog gedefinieerd moeten worden
+    }
+
+}

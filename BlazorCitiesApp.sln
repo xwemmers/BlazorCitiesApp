@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCitiesApp.Server", "BlazorCitiesApp\Server\BlazorCitiesApp.Server.csproj", "{1297E8FC-72D9-4B44-9445-90E3CF9BD190}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorCitiesApp.Server", "BlazorCitiesApp\Server\BlazorCitiesApp.Server.csproj", "{1297E8FC-72D9-4B44-9445-90E3CF9BD190}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCitiesApp.Client", "BlazorCitiesApp\Client\BlazorCitiesApp.Client.csproj", "{EA760E25-8932-4364-BD5E-848AF990265C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorCitiesApp.Client", "BlazorCitiesApp\Client\BlazorCitiesApp.Client.csproj", "{EA760E25-8932-4364-BD5E-848AF990265C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorCitiesApp.Shared", "BlazorCitiesApp\Shared\BlazorCitiesApp.Shared.csproj", "{EA2271CB-8FD2-4A30-B89A-600D08B99A35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorCitiesApp.Shared", "BlazorCitiesApp\Shared\BlazorCitiesApp.Shared.csproj", "{EA2271CB-8FD2-4A30-B89A-600D08B99A35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
